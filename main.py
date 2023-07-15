@@ -99,26 +99,22 @@ def draw_text_middle(surface, text, size, color):
     label = font.render(text, 1, color)
     surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
 
-
-def draw_grid(surface, grid):
-    for i in range(len(grid)):
-        for j in range(len(grid[i])):
-            pygame.draw.rect(surface, grid[i][j], (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
-
+def draw_score(surface, score, x, y, size=40, color=(255,255,255)):
+    font = pygame.font.SysFont('comicsans', size, bold=True)
+    label = font.render(f'Score: {score}', 1, color)
+    surface.blit(label, (x, y))
 
 def draw_window(surface, grid):
     surface.fill((0, 0, 0))
 
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            pygame.draw.rect(surface, grid[i][j],
-                             (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
+            pygame.draw.rect(surface, grid[i][j], (top_left_x + j*30, top_left_y + i*30, 30, 30), 0)
 
     pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 4)
-    pygame.display.update()
 
 
-def main():
+def main(surface):
     locked_positions = {}
     grid = create_grid(locked_positions)
 
@@ -128,6 +124,7 @@ def main():
     next_piece = get_shape()
     clock = pygame.time.Clock()
     fall_time = 0
+    score = 0  # initialise the score counter
 
     while run:
         fall_speed = 0.27
@@ -141,29 +138,34 @@ def main():
             if not valid_space(grid, current_piece) and current_piece.row > 0:
                 current_piece.row -= 1
                 change_piece = True
+                score += 10  # increase the score
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 pygame.display.quit()
+                quit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     current_piece.column -= 1
                     if not valid_space(grid, current_piece):
                         current_piece.column += 1
-                if event.key == pygame.K_RIGHT:
+
+                elif event.key == pygame.K_RIGHT:
                     current_piece.column += 1
                     if not valid_space(grid, current_piece):
                         current_piece.column -= 1
-                if event.key == pygame.K_DOWN:
+
+                elif event.key == pygame.K_DOWN:
                     current_piece.row += 1
                     if not valid_space(grid, current_piece):
                         current_piece.row -= 1
+
                 if event.key == pygame.K_UP:
-                    current_piece.rotation = current_piece.rotation + 1 % len(current_piece.shape)
+                    current_piece.rotation += 1
                     if not valid_space(grid, current_piece):
-                        current_piece.rotation = current_piece.rotation - 1 % len(current_piece.shape)
+                        current_piece.rotation -= 1
 
         shape_pos = convert_shape_format(current_piece)
 
@@ -180,33 +182,35 @@ def main():
             next_piece = get_shape()
             change_piece = False
 
-        draw_window(win, grid)
+        draw_window(surface, grid)
+        draw_score(surface, score, 5, 5)  # Draw the score
         pygame.display.update()
 
         if check_lost(locked_positions):
             run = False
 
-    draw_text_middle(win, "You Lost", 80, (255, 255, 255))
+    draw_text_middle(surface, "GAME OVER", 80, (255, 255, 255))
     pygame.display.update()
     pygame.time.delay(2000)
 
 
-def main_menu():
+def main_menu(surface):
     run = True
     while run:
-        win.fill((0, 0, 0))
-        draw_text_middle(win, 'Press Any Key To Play', 60, (255, 255, 255))
+        surface.fill((0, 0, 0))
+        draw_text_middle(surface, 'Press Any Key To Play', 60, (255, 255, 255))
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if event.type == pygame.KEYDOWN:
-                main()
 
-    pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                main(surface)
+
+    pygame.display.quit()
 
 
 win = pygame.display.set_mode((s_width, s_height))
 pygame.display.set_caption('Tetris')
 
-main_menu()  # start game
+main_menu(win)  # start game
