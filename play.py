@@ -14,7 +14,7 @@ top_left_y = s_height - play_height - 50
 
 shapes = [
     [['.....', '.....', '..00.', '.00..', '.....'], ['.....', '..0..', '..00.', '...0.', '.....']],
-    [['.....', '.....', '.00..', '..00.', '.....'], ['.....', '..0..', '.00..', '.0...', '.....']],
+    [['.....', '.....', '.00..', '..00.', '.....'], ['.....', '..0..', '.00..', '...0.', '.....']],
     [['.....', '..0..', '..0..', '..0..', '..0..'], ['.....', '0000.', '.....', '.....', '.....']],
     [['.....', '.....', '.00..', '.00..', '.....']],
     [['.....', '.0...', '.000.', '.....', '.....'], ['.....', '..00.', '..0..', '..0..', '.....'],
@@ -88,15 +88,13 @@ def get_shape():
 def draw_text_middle(surface, text, size, color):
     font = pygame.font.SysFont('comicsans', size, bold=True)
     label = font.render(text, 1, color)
-    surface.blit(label, (
-    top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
+    surface.blit(label, (top_left_x + play_width / 2 - (label.get_width() / 2), top_left_y + play_height / 2 - label.get_height() / 2))
 
 
 def draw_grid(surface, grid):
     for i in range(len(grid)):
         for j in range(len(grid[i])):
-            pygame.draw.rect(surface, grid[i][j],
-                             (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
+            pygame.draw.rect(surface, grid[i][j], (top_left_x + j * block_size, top_left_y + i * block_size, block_size, block_size), 0)
     pygame.draw.rect(surface, (255, 255, 255), (top_left_x, top_left_y, play_width, play_height), 4)
 
 
@@ -151,6 +149,12 @@ def draw_window(surface, grid, score=0):
             pygame.draw.rect(surface, grid[i][j], (top_left_x + j * 30, top_left_y + i * 30, 30, 30), 0)
     pygame.draw.rect(surface, (255, 0, 0), (top_left_x, top_left_y, play_width, play_height), 5)
     draw_grid(surface, grid)
+
+    # Displaying the version number in the bottom-left corner
+    version_number = "V.0.3"
+    font = pygame.font.SysFont('comicsans', 20)
+    label = font.render(version_number, 1, (255, 255, 255))
+    surface.blit(label, (10, s_height - 30))
 
 
 def main(win):
